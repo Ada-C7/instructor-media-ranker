@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :require_login, except: [:auth_callback]
+
   def index
     @users = User.all
   end
@@ -43,11 +45,6 @@ class UsersController < ApplicationController
     flash[:result_text] = "Successfully logged out"
     redirect_to root_path
   end
-
-
-
-
-
 
 
 end
