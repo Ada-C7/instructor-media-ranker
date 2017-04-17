@@ -4,6 +4,8 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
+  before_action :require_login, except: [:root]
+
   def root
     @albums = Work.best_albums
     @books = Work.best_books

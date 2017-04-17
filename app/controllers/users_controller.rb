@@ -20,9 +20,9 @@ class UsersController < ApplicationController
       user = User.from_github(auth_hash)
       if user.save
         session[:user_id] = user.id
-        flash[:message] = "Succesfully logged in as new user #{user.username}"
+        flash[:result_text] = "Succesfully logged in as new user #{user.username}"
       else
-        flash[:message] = "Could not log in"
+        flash[:result_text] = "Could not log in"
         user.errors.messages.each do |field, problem|
           flash[:field] = problem.join(', ')
         end
