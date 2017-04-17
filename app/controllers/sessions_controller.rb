@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     if auth_hash['uid']
       user = User.find_by(uid: auth_hash[:uid], provider: 'github')
       if user.nil?
-        User.create_from_github(auth_hash)
+        user = User.create_from_github(auth_hash)
       else
         flash[:success] = "Logged in successfully"
         redirect_to :root
