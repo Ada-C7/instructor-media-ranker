@@ -3,6 +3,8 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :check_login, only: [:root]
+
 
   def root
     @albums = Work.best_albums
@@ -103,4 +105,6 @@ private
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
   end
+
+
 end
