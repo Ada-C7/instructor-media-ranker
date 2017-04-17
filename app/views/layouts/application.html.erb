@@ -16,15 +16,15 @@
       <small>Ranking the Best of Everything</small>
     </h2>
 
-    <nav>
-      <ul>
-        <% if @user.nil? %>
-          <li><%= link_to "Log In", "/auth/github" %></li>
-        <% else %>
-          <li><%= link_to "Log Out" %></li>
-        <% end %>
-      </ul>
-    </nav>
+    <div class="columns large-3 small-12">
+      <% if @user %>
+        <p class="text-right">Logged in as: <%= link_to @user.username, user_path(@user.id) %></p>
+        <a class="float-right"><%= button_to "Log Out" %></a>
+      <% else %>
+        <p class="text-right">Not logged in</p>
+        <a class="float-right"><%= button_to "Log In", "/auth/github", :class => "button", :method => :get %></a>
+      <% end %>
+    </div>
   </header>
 
   <% if flash[:result_text] or flash[:messages] %>
