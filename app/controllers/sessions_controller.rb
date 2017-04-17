@@ -9,13 +9,16 @@ class SessionsController < ApplicationController
     if user.nil?
       user = User.create_from_github(auth_hash)
       if user.nil?
-        flash[:warning] = "Unable to login"
+        flash[:status] = :warning
+        flash[:result_text] = "Unable to login"
         redirect_to root_path
       end
     end
+
     #set sessions
     session[:user_id] = user.id
-    flash[:success] = "Logged in successfullyas #{ user.email }"
+    flash[:status] = :success
+    flash[:result_text] = "Successfully logged in as #{ user.email }"
     redirect_to root_path
   end
 
@@ -25,7 +28,7 @@ class SessionsController < ApplicationController
     flash[:result_text] = "Successfully logged out"
     redirect_to root_path
   end
-  
+
   # def login_form
   # end
   #
