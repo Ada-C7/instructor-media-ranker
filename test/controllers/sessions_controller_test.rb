@@ -21,32 +21,32 @@ describe SessionsController do
     # where there's an interesting difference between a logged-in
     # and not-logged-in user.
     it "succeeds for a new user" do
-      username = "test_user"
-      # Precondition: no user with this username exists
-      User.find_by(username: username).must_be_nil
+      email = "test_user"
+      # Precondition: no user with this email exists
+      User.find_by(email: email).must_be_nil
 
-      post login_path, params: { username: username }
+      post login_path, params: { email: email }
       must_redirect_to root_path
     end
 
     it "succeeds for a returning user" do
-      username = User.first.username
-      post login_path, params: { username: username }
+      email = User.first.email
+      post login_path, params: { email: email }
       must_redirect_to root_path
     end
 
-    it "renders 400 bad_request if the username is blank" do
-      post login_path, params: { username: "" }
+    it "renders 400 bad_request if the email is blank" do
+      post login_path, params: { email: "" }
       must_respond_with :bad_request
     end
 
     it "succeeds if a different user is already logged in" do
-      username = "user_1"
-      post login_path, params: { username: username }
+      email = "user_1"
+      post login_path, params: { email: email }
       must_redirect_to root_path
 
-      username = "user_2"
-      post login_path, params: { username: username }
+      email = "user_2"
+      post login_path, params: { email: email }
       must_redirect_to root_path
     end
   end
@@ -54,7 +54,7 @@ describe SessionsController do
   describe "logout" do
     it "succeeds if the user is logged in" do
       # Gotta be logged in first
-      post login_path, params: { username: "test user" }
+      post login_path, params: { email: "test user" }
       must_redirect_to root_path
 
       post logout_path

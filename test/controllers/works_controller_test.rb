@@ -208,11 +208,11 @@ describe WorksController do
   end
 
   describe "upvote" do
-    let(:user) { User.create!(username: "test_user") }
+    let(:user) { User.create!(email: "test_user") }
     let(:work) { Work.first }
 
     def login
-      post login_path, params: { username: user.username }
+      post login_path, params: { email: user.email }
       must_respond_with :redirect
     end
 
