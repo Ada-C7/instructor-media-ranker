@@ -13,4 +13,12 @@ private
       @user = User.find_by(id: session[:user_id])
     end
   end
+
+  def require_login
+    lookup_user
+    if @user.nil?
+      flash[:result_text] = "You must login to view that page"
+      redirect_to root_path
+    end
+  end
 end
