@@ -18,6 +18,14 @@ class SessionsController < ApplicationController
     flash[:success] = "Logged in successfullyas #{ user.email }"
     redirect_to root_path
   end
+
+  def logout
+    session[:user_id] = nil
+    flash[:status] = :success
+    flash[:result_text] = "Successfully logged out"
+    redirect_to root_path
+  end
+  
   # def login_form
   # end
   #
@@ -44,10 +52,5 @@ class SessionsController < ApplicationController
   #   redirect_to root_path
   # end
   #
-  # def logout
-  #   session[:user_id] = nil
-  #   flash[:status] = :success
-  #   flash[:result_text] = "Successfully logged out"
-  #   redirect_to root_path
-  # end
+
 end
