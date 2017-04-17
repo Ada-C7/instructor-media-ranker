@@ -31,7 +31,7 @@ class UsersController < ApplicationController
     else
       # Welcome back!
       session[:user_id] = user.id
-      flash[:message] = "Welcome back, #{user.username}"
+      flash[:result_text] = "Welcome back, #{user.username}!"
     end
 
     redirect_to root_path
