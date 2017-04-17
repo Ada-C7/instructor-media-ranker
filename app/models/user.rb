@@ -14,4 +14,5 @@ class User < ApplicationRecord
     user.username = auth_hash["info"]["name"] || "Stanley"
     user.email = auth_hash["info"]["email"]
     user.save ? user : nil
+  end
 end
