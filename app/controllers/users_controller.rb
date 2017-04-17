@@ -36,4 +36,12 @@ class UsersController < ApplicationController
       flash[:result_text] = "Successfully logged in as returning #{user.username}"
       redirect_to root_path
     end
+
+    def logout
+      session[:user_id] = nil
+      flash[:status] = :success
+      flash[:result_text] = "Successfully logged out"
+      redirect_to root_path
+    end
+
 end
