@@ -35,21 +35,21 @@ class SessionsController < ApplicationController
 
   def create
     auth_hash = request.env['omniauth.auth']
-    raise
+    #raise
 
     user = User.find_by(uid: auth_hash["uid"])
 
     if user.nil?
-      create_from_github(auth_hash)
+      user = User.create_from_github(auth_hash)
       if user.nil?
         flash[:error] = "Could not log in"
-        redirect_to root
+        redirect_to root_path
       end
-    end 
+    end
 
     session[:user_id] = user.id
     flash[:success] = "You are successfully logged in"
-    redirect_to root
+    redirect_to root_path
   end
 
 end
