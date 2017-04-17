@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :block_if_not_logged_in
+
   def index
     @users = User.all
   end
