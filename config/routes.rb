@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   root 'works#root'
 
   get "/auth/:provider/callback", to: "sessions#login"
+  post '/logout', to: 'sessions#logout', as: 'logout'
 
   # Build the category routes for albums, books and movies
   category_constraints = { category: /(albums)|(books)|(movies)/}

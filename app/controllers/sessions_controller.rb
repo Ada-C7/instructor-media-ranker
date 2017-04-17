@@ -24,4 +24,10 @@ class SessionsController < ApplicationController
 
     redirect_to root_path
   end
+
+  def logout
+    session[:user_id] = nil
+    flash[:success] = "Logged Out"
+    redirect_to root_path
+  end
 end
