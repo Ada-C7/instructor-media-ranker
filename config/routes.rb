@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#login'
   post '/logout', to: 'sessions#logout', as: 'logout'
 
+  get "/auth/github/callback", to: "sessions#create"
+
   # Build the category routes for albums, books and movies
   category_constraints = { category: /(albums)|(books)|(movies)/}
   get '/:category', to: 'works#index', as: 'works', constraints: category_constraints
