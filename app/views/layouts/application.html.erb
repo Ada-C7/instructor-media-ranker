@@ -15,6 +15,16 @@
       <%= link_to "Media Ranker", root_path %>
       <small>Ranking the Best of Everything</small>
     </h2>
+
+    <nav>
+      <ul>
+        <% if @user.nil? %>
+          <li><%= link_to "Log In", "/auth/github" %></li>
+        <% else %>
+          <li><%= link_to "Log Out" %></li>
+        <% end %>
+      </ul>
+    </nav>
   </header>
 
   <% if flash[:result_text] or flash[:messages] %>
