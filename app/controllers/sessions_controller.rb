@@ -2,6 +2,27 @@ class SessionsController < ApplicationController
   def login_form
   end
 
+  def index
+    @user = User.find(session[:user_id]) # < recalls the value set in a previous request
+  end
+
+  def create
+    auth_hash = request.env['omniauth.auth']
+    user = User.find_by(uid: auth_hash["uid"], provider: auth_hash["provider"])
+
+    if user.nil?
+      user = User.build_from_github(auth_hash)
+      if user.nil?
+        flash[:error] = "Could not log in."
+        redirect_to root_path
+      end
+    else# having this end here means that the login will always set the session user id to the user id regardless of whether the user is in the database
+      session[:user_id] = user.id # this is the identifier from our user database
+      flash[:success] = "Logged in successfully"
+      redirect_to root_path
+    end
+  end
+
   # def login
   #   username = params[:username]
   #   if username and user = User.find_by(username: username)
@@ -32,8 +53,4 @@ class SessionsController < ApplicationController
     redirect_to root_path
   end
 
-  def create
-    auth_hash = request.env['omniauth.auth']
-    raise
-  end
 end
