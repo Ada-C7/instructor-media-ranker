@@ -38,8 +38,7 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
