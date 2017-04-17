@@ -13,9 +13,10 @@ class SessionsController < ApplicationController
         flash[:success] = "Welcome #{user.username} - you are logged in through Github"
       else
         flash[:failure] = "could not log in"
-        user.errors.messages.each do |field, problem|
-          flash[:field] = problem.join(', ')
-        end
+        flash[:messages] = user.errors.messages
+        # user.errors.messages.each do |field, problem|
+        #   flash[:field] = problem.join(', ')
+        # end
       end
     else
       session[:user_id] = user.id

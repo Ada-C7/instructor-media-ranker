@@ -24,12 +24,12 @@ class WorksController < ApplicationController
   def create
     @work = Work.new(media_params)
     if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
+      # flash[:status] = :success
+      flash[:success] = "Successfully created #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
     else
-      flash[:status] = :failure
-      flash[:result_text] = "Could not create #{@media_category.singularize}"
+      # flash[:status] = :failure
+      flash[:failure] = "Could not create #{@media_category.singularize}"
       flash[:messages] = @work.errors.messages
       render :new, status: :bad_request
     end
@@ -45,12 +45,12 @@ class WorksController < ApplicationController
   def update
     @work.update_attributes(media_params)
     if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+      # flash[:status] = :success
+      flash[:success] = "Successfully updated #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
     else
-      flash.now[:status] = :failure
-      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+      # flash.now[:status] = :failure
+      flash.now[:failure] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
       render :edit, status: :not_found
     end
@@ -58,8 +58,8 @@ class WorksController < ApplicationController
 
   def destroy
     @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+    # flash[:status] = :success
+    flash[:success] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
     redirect_to root_path
   end
 
@@ -72,16 +72,16 @@ class WorksController < ApplicationController
     if @user
       vote = Vote.new(user: @user, work: @work)
       if vote.save
-        flash[:status] = :success
-        flash[:result_text] = "Successfully upvoted!"
+        # flash[:status] = :success
+        flash[:success] = "Successfully upvoted!"
         status = :found
       else
-        flash[:result_text] = "Could not upvote"
+        flash[:failure] = "Could not upvote"
         flash[:messages] = vote.errors.messages
         status = :conflict
       end
     else
-      flash[:result_text] = "You must log in to do that"
+      flash[:failure] = "You must log in to do that"
       status = :unauthorized
     end
 

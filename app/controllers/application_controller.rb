@@ -17,7 +17,7 @@ private
   def require_login
     lookup_user
     if @user.nil?
-      flash[:result_text] = "You must login to view that page"
+      flash[:failure] = "You must login to view that page"
       redirect_to root_path
     end
   end
