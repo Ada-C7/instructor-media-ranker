@@ -4,6 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   before_action :block_if_not_logged_in, except: [:root]
+  before_action :block_unless_owner, only: [:edit, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -23,6 +24,8 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = session[:user_id]
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -103,5 +106,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def block_unless_owner
+    unless @work.user_id == session[:user_id]
+      flash[:result_text] = "You may only edit works that you created."
+      flash[:status] = :failure
+      redirect_to :back
+    end
   end
 end
