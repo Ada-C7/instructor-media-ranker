@@ -8,7 +8,11 @@ class SessionsController < ApplicationController
     #if not there create a new user
     if user.nil?
       user = User.create_from_github(auth_hash)
-
+      if user.nil?
+        flash[:warning] = "Unable to login"
+        redirect_to root_path
+      end
+    end
     #set sessions
     session[:user_id] = user.id
     flash[:success] = "Logged in successfullyas #{ user.email }"
