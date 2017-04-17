@@ -25,6 +25,28 @@ class SessionsController < ApplicationController
     redirect_to root_path
   end
 
+
+  def create
+    #request os a rails thing
+    #omniauth.auth is a onmiauth thing
+    auth_hash = request.env['omniauth.auth']
+    # raise
+    user = User.find_by(uid: auth_hash["uid"], provider: auth_hash["provider"])
+    #if it is not there them make/save it
+    if user.nil?
+      user = User.create_from_github(auth_hash)
+      if user.nil?
+        flash[:error] = "Could not log in."
+        redirect_to root_path
+      end
+    end
+      #if it is there then save some data to session the redirect
+      session[:user_id] = user.id
+      flash[:success] = "Logged in succesfully!"
+      redirect_to root_path
+  end
+
+
   def logout
     session[:user_id] = nil
     flash[:status] = :success
