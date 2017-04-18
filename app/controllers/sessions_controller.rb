@@ -14,9 +14,6 @@ class SessionsController < ApplicationController
       else
         flash[:failure] = "could not log in"
         flash[:messages] = user.errors.messages
-        # user.errors.messages.each do |field, problem|
-        #   flash[:field] = problem.join(', ')
-        # end
       end
     else
       session[:user_id] = user.id

@@ -21,4 +21,13 @@ private
       redirect_to root_path
     end
   end
+
+  def validate_user
+    lookup_user
+    if @user == session[:user_id]
+    else
+      flash[:failure] = "Only user who added media, can edit or delete"
+      redirect_to(:back)
+    end
+  end
 end
