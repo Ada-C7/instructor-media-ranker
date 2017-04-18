@@ -3,6 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
 
   def root
     @albums = Work.best_albums
@@ -68,8 +69,8 @@ class WorksController < ApplicationController
     # For status codes, see
     # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if current_user
+      vote = Vote.new(user: current_user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
