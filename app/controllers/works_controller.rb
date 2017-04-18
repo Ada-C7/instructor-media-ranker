@@ -5,6 +5,7 @@ class WorksController < ApplicationController
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
   before_action :require_login, except: [:root]
+  before_action :require_ownership, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -24,6 +25,8 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = session[:user_id]
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -44,6 +47,7 @@ class WorksController < ApplicationController
   end
 
   def update
+
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
@@ -91,7 +95,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
@@ -105,4 +109,14 @@ private
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
   end
+
+  def require_ownership
+    @work = Work.find_by(id: params[:id])
+    lookup_user
+    unless @current_user.id == @work.user_id
+      flash[:result_text] = "Only the owner can edit or delete the work, and alas, that is not you."
+      redirect_to work_path(@work)
+    end
+  end
+
 end
