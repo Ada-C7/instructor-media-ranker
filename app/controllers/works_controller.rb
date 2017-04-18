@@ -3,6 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_ownership, only: [:edit, :update, :destroy]
   # before_action :require_login, except: [:root]
 
   def root
@@ -103,5 +104,15 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_ownership
+    require_login
+    @work = Work.find_by(id: params[:id])
+    if @work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner of the work to make that change"
+      redirect_to work_path
+    end
   end
 end
