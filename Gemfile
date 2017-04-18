@@ -39,6 +39,9 @@ gem 'jbuilder', '~> 2.5'
 # Use the Foundation CSS framework
 gem 'foundation-rails'
 
+gem 'omniauth'
+gem 'omniauth-github'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
@@ -48,6 +51,11 @@ group :development, :test do
 
   # Use pry for rails console
   gem 'pry-rails'
+
+  # Use .env file for OAuth client ID and client secret
+  gem 'dotenv-rails'
+
+  gem 'binding_of_caller'
 end
 
 group :test do
