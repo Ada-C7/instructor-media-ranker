@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_login, only: [:create]
+
 
   def create
     auth_hash = request.env['omniauth.auth']
@@ -9,13 +11,15 @@ class SessionsController < ApplicationController
       user = User.create_from_github(auth_hash)
 
       if user.nil?
-        flash[:error] = "Could not log in"
+        flash[:status] = :failure
+        flash[:result_text] = "Could not log in"
         redirect_to root_path
       end
     end
 
     session[:user_id] = user.id
-    flash[:success] = "Logged in successfully as #{user.username} with ID #{user.id}"
+    flash[:status] = :success
+    flash[:result_text] = "Logged in successfully as #{user.username} with ID #{user.id}"
     redirect_to root_path
   end
 
