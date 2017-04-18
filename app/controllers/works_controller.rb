@@ -44,24 +44,32 @@ class WorksController < ApplicationController
   end
 
   def update
-    @work.update_attributes(media_params)
-    if @work.save
-      # flash[:status] = :success
-      flash[:success] = "Successfully updated #{@media_category.singularize} #{@work.id}"
-      redirect_to works_path(@media_category)
-    else
-      # flash.now[:status] = :failure
-      flash.now[:failure] = "Could not update #{@media_category.singularize}"
-      flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+    if @work.user_id == @user.id
+      @work.update_attributes(media_params)
+      if @work.save
+        # flash[:status] = :success
+        flash[:success] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+        redirect_to works_path(@media_category)
+      else
+        # flash.now[:status] = :failure
+        flash.now[:failure] = "Could not update #{@media_category.singularize}"
+        flash.now[:messages] = @work.errors.messages
+        render :edit, status: :not_found
+      end
     end
+    flash[:failure] = "Only the owner of this work can edit the information"
+    redirect_to work_path(@work.id)
   end
 
   def destroy
-    @work.destroy
-    # flash[:status] = :success
-    flash[:success] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if @work.user_id == @user.id
+      @work.destroy
+      # flash[:status] = :success
+      flash[:success] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
+    flash[:failure] = "Only the owner of this work can delete it"
+    redirect_to work_path(@work.id)
   end
 
   def upvote
