@@ -132,6 +132,9 @@ GEM
     omniauth-github (1.2.3)
       omniauth (~> 1.5)
       omniauth-oauth2 (>= 1.4.0, < 2.0)
+    omniauth-google_oauth2 (0.1.5)
+      omniauth (~> 1.0)
+      omniauth-oauth2
     omniauth-oauth2 (1.4.0)
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
@@ -236,6 +239,7 @@ DEPENDENCIES
   minitest-spec-rails
   omniauth
   omniauth-github
+  omniauth-google_oauth2
   pg (~> 0.18)
   pry-rails
   puma (~> 3.0)
