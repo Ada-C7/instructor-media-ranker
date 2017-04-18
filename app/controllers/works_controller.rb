@@ -1,4 +1,6 @@
 class WorksController < ApplicationController
+  before_action :require_login, except: [:root]
+
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
