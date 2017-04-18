@@ -4,7 +4,9 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :check_login, only: [:root]
-
+  before_action :limit_change, only: [:edit, :destroy]
+  helper_method :current_user
+  helper_method :created_by_current_user?
 
   def root
     @albums = Work.best_albums
@@ -24,6 +26,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.belongs_to = current_user.id
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -104,6 +107,14 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def limit_change
+    if @work.belongs_to != current_user.id
+      status = :unauthorized
+      flash[:result_text] = "You must be the creator of this work to make a change"
+      redirect_to root_path
+    end
   end
 
 
