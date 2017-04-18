@@ -40,6 +40,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if !User.owns_work(@work, current_user)
+      flash[:status] = :failure
+      flash[:result_text] = "You cannot edit a work you didn't create."
+      redirect_to work_path
+    end
   end
 
   def update
