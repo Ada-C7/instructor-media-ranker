@@ -34,27 +34,39 @@ class SessionsController < ApplicationController
 
   def create
     auth_hash = request.env['omniauth.auth']
-    # raise
-    if auth_hash['uid']
-      user = User.find_by(uid: auth_hash[:uid], provider: 'github')
-      if user.nil?
-        # User doesn't match anything in the DB
-        # Attempt to create a new user
-        user = User.build_from_github(auth_hash)
+    # if auth_hash['uid']
+    user = User.find_by(oauth_provider: params[:provider], oauth_uid: auth_hash["uid"])
+    if user.nil?
+      # User doesn't match anything in the DB
+      # Attempt to create a new user
+      user = User.from_github(auth_hash)
+      ##
+      if user.save
+        session[:user_id] = user.id
+        flash[:success] = "Successfully logged in as new user #{user.username}"
       else
-        flash[:success] = "Logged in successfully"
-        redirect_to root_path
+        flash[:message] = "Could not log in"
+        user.errors.messages.each do |field, problem|
+          flash[:field] = problem.join(', ')
+        end
       end
 
-      # If we get here, we have the user instance
-      session[:user_id] = user.id
     else
-      flash[:error] = "Could not log in"
-      redirect_to root_path
+      # Welcome back!
+      session[:user_id] = user.id
+      flash[:success] = "Welcome back, #{user.username}"
     end
+    redirect_to root_path
   end
 
   def index
-    @user = User.find(session[:user_id]) # < recalls the value set in a previous request
+    @current_user = User.find(session[:user_id]) # < recalls the value set in a previous request
+  end
+
+  def logout
+    session[:user_id] = nil
+    flash[:status] = :success
+    flash[:result_text] = "Successfully logged out"
+    redirect_to root_path
   end
 end

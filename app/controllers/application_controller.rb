@@ -10,8 +10,17 @@ class ApplicationController < ActionController::Base
 
 private
   def lookup_user
-    if session[:user_id]
-      @login_user = User.find_by(id: session[:user_id])
+    unless session[:user_id].nil?
+      @current_user = User.find_by(id: session[:user_id])
+    end
+  end
+
+  def require_login
+    lookup_user
+    if @current_user.nil?
+      flash[:message] = "You must be logged in to see that page"
+      # In a before_action filter, this will prevent the action from running at all
+      redirect_to root_path
     end
   end
 end
