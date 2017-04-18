@@ -26,8 +26,8 @@ private
     lookup_user
     work = Work.find_by(id: params[:id])
     if work.user != @user
-      flash[:failure] = "Only user who added media, can edit or delete"
-      redirect_to work_path(work.id) 
+      flash[:failure] = "Only user who added media can edit or delete"
+      redirect_to work_path(work.id)
     end
   end
 end
