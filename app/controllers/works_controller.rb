@@ -41,6 +41,12 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if @work.user_id != @login_user.id
+      #tell them they can't do it, redirect to root path?
+      flash[:status] = :failure
+      flash[:result_text] = "You can only edit a work that you created."
+      redirect_to root_path
+    end
   end
 
   def update
