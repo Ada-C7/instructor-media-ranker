@@ -25,8 +25,10 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
-    
+    @work.user_id = session[:user_id]
+
     if @work.save
+
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
@@ -46,7 +48,7 @@ class WorksController < ApplicationController
   end
 
   def update
-
+    if @work.user_id == session[:user_id]
       @work.update_attributes(media_params)
       if @work.save
         flash[:status] = :success
@@ -58,16 +60,26 @@ class WorksController < ApplicationController
         flash.now[:messages] = @work.errors.messages
         render :edit, status: :not_found
       end
+    else
+      flash[:result_text] = "You didn't add this #{@media_category.singularize}. You cannot edit it!"
+      redirect_to root_path
+    end
+
 
       # flash[:result_text] = "You can only edit the work that you added!"
 
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if @work.user_id == session[:user_id]
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    else
+      flash[:result_text] = "You didn't add this #{@media_category.singularize}. You cannot delete it!"
+      redirect_to root_path
+    end
   end
 
   def upvote
