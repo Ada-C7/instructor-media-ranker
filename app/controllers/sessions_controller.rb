@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_login, only: [:create]
+
   def login_form; end
 
   def create
@@ -9,17 +11,19 @@ class SessionsController < ApplicationController
     if user.nil?
       user = User.create_from_github(auth_hash)
       if user.nil?
-        flash[:error] = "Could not log in"
+        flash[:status] = :error
+        flash[:result_text] = "Could not log in"
         redirect_to root_path
       end
     end
 
     session[:user_id] = user.id
-    flash[:success] = "Logged in successfully!"
+    flash[:status] = :success
+    flash[:result_text] = "Logged in successfully!"
     redirect_to root_path
 
   end
-  
+
   def logout
     session[:user_id] = nil
     flash[:status] = :success
