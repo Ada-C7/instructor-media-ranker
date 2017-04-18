@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_login, only: [:create]
+
   def login_form; end
 
   def create
@@ -14,7 +16,7 @@ class SessionsController < ApplicationController
       end
     end
 
-  
+
     session[:user_id] = user.id
     flash[:success] = "Logged in successfully!"
     redirect_to root_path
