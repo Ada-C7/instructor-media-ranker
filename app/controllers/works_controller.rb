@@ -6,6 +6,7 @@ class WorksController < ApplicationController
 
   before_action :require_login , only: [:show, :index, :new, :create]
 
+  # before_action :check_owner , except: [:upvote]
   before_action :check_owner , only: [:edit, :destroy]
 
   def root
@@ -27,7 +28,7 @@ class WorksController < ApplicationController
     @work = Work.new(media_params)
 
     @work.user = find_user
-
+    # @work.user_id = session[:user_id]
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
