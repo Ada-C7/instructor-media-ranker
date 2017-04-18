@@ -101,8 +101,21 @@ private
   end
 
   def category_from_work
-    @work = Work.find_by(id: params[:id])
+    # @work = Work.find_by(id: params[:id])
+    @work = find_work
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
   end
+
+  def find_work
+    @work = Work.find_by(id: params[:id])
+  end
+
+  # def check_owner
+  #   # when user tries to edit or delete a work, check for ownership
+  #   # find_user (returns current user)
+  #   # find_work (returns current work)
+  #   # compare work.user_id and user.id
+  #   # error message and redirect if they do not match
+  # end
 end
