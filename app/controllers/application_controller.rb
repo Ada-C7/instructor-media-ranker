@@ -3,6 +3,21 @@ class ApplicationController < ActionController::Base
 
   before_action :find_user
 
+  before_action :require_login
+
+  def require_login
+    if !session[:user_id]
+      flash[:result_text] = "you must be logged in to view this page"
+      redirect_to root_path
+    end
+  end
+
+  def current_user
+    @logged_in_user ||= User.find(session[:user_id]) if session[:user_id]
+  end
+
+
+
   def render_404
     # DPR: supposedly this will actually render a 404 page in production
     raise ActionController::RoutingError.new('Not Found')
