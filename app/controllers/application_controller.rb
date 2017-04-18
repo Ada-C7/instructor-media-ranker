@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
 
   before_action :find_user
   before_action :check_login
+  helper_method :current_user
 
 
   def render_404
@@ -19,7 +20,7 @@ private
   end
 
   def current_user
-    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @logged_in_user ||= User.find(session[:user_id]) if session[:user_id]
   end
 
   def check_login
