@@ -3,9 +3,11 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_login, except: [:root]
 
   def root
     @albums = Work.best_albums
+    puts flash.to_h
     @books = Work.best_books
     @movies = Work.best_movies
     @best_work = Work.order(vote_count: :desc).first
@@ -91,7 +93,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_url

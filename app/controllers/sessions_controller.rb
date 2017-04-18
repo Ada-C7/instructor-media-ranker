@@ -5,7 +5,6 @@ class SessionsController < ApplicationController
     auth_hash = request.env['omniauth.auth']
 
     user = User.find_by(oauth_provider: params[:provider], oauth_id: auth_hash["uid"])
-
     if user.nil?
       # User doesn't match anything in the DB
       # Attempt to create a new user
