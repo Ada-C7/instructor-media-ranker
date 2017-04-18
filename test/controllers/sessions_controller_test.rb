@@ -3,9 +3,9 @@ require "test_helper"
 describe SessionsController do
   describe "login_form" do
     # The login form is a static page - no real way to make it fail
-    it "succeeds" do
+    it "redirects to github to login" do
       get "/auth/github"
-      must_respond_with :success
+      must_respond_with :redirect
     end
   end
 
