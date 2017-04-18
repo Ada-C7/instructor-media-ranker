@@ -111,7 +111,7 @@ private
 
   def limit_change
     if @work.belongs_to != current_user.id
-      status = :unauthorized
+      status = :error
       flash[:result_text] = "You must be the creator of this work to make a change"
       redirect_to root_path
     end
