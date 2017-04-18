@@ -1,7 +1,7 @@
 class Work < ApplicationRecord
   has_many :votes, dependent: :destroy
   has_many :ranking_users, through: :votes, source: :user
-
+  validates :owner, presence: true
   validates :category,  presence: true,
                         inclusion: { in: %w(album book movie) }
 
