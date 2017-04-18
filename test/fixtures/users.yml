@@ -2,6 +2,12 @@
 
 dan:
   username: dan
+  uid: 111
+  provider: flavor_flav
+  email: yo@yoyoyo.com
 
 kari:
   username: kari
+  uid: 222
+  provider: death_star
+  email: eggs@eggsandtoast.com
