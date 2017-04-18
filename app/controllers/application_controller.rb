@@ -24,10 +24,10 @@ private
 
   def validate_user
     lookup_user
-    if @user == session[:user_id]
-    else
+    work = Work.find_by(id: params[:id])
+    if work.user != @user
       flash[:failure] = "Only user who added media, can edit or delete"
-      redirect_to(:back)
+      redirect_to work_path(work.id) 
     end
   end
 end
