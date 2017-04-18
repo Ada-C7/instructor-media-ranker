@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   validates :provider, :email, :uid, :name, presence: true
 
-  def self.create_from_github(auth_hash)
+  def self.create_from_oauth(auth_hash)
     user = User.new
     user.uid = auth_hash["uid"]
     user.provider = auth_hash["provider"]

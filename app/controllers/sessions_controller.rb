@@ -4,9 +4,10 @@ skip_before_action :check_login, only: [:create]
 
   def create
     auth_hash = request.env['omniauth.auth']
+    # raise
     user = User.find_by(uid: auth_hash["uid"], provider: auth_hash["provider"])
     if user.nil?
-      user = User.create_from_github(auth_hash)
+      user = User.create_from_oauth(auth_hash)
       if user.nil?
         flash[:error] = "Unable to log you in."
         redirect_to root_path
