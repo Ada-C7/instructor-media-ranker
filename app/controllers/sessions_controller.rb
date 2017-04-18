@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
-  # def login_form
-  # end
+  skip_before_action :require_login, only: [:create]
+
   def create
     auth_hash = request.env['omniauth.auth']
 
@@ -20,9 +20,6 @@ class SessionsController < ApplicationController
     end
 
   end
-
-
-
   # def login
   #   username = params[:username]
   #   if username and user = User.find_by(username: username)
