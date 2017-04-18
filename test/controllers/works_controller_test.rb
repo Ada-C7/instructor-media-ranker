@@ -212,7 +212,7 @@ describe WorksController do
     let(:work) { Work.first }
 
     def login
-      post login_path, params: { username: user.username }
+      post "/auth/github", params: { username: user.username }
       must_respond_with :redirect
     end
 
