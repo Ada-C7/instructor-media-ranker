@@ -9,6 +9,22 @@ describe SessionsController do
     end
   end
 
+  describe "logout" do
+    it "succeeds if the user is logged in" do
+      # Gotta be logged in first
+      get "/auth/github", params: { username: "test user" }
+      must_redirect_to root_path
+
+      post logout_path
+      must_redirect_to root_path
+    end
+
+    it "succeeds if the user is not logged in" do
+      post logout_path
+      must_redirect_to root_path
+    end
+  end
+
   # describe "login" do
   #   # This functionality is complex!
   #   # There are definitely interesting cases I haven't covered
@@ -52,19 +68,5 @@ describe SessionsController do
   #   end
   # end
 
-  describe "logout" do
-    it "succeeds if the user is logged in" do
-      # Gotta be logged in first
-      get "/auth/github", params: { username: "test user" }
-      must_redirect_to root_path
 
-      post logout_path
-      must_redirect_to root_path
-    end
-
-    it "succeeds if the user is not logged in" do
-      post logout_path
-      must_redirect_to root_path
-    end
-  end
 end
