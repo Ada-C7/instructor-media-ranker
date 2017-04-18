@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
     #see if user is logged in.
     if !session[:user_id]
     #If not flash warning, redirect to root_path
-      flash[:status] = :warning
+      flash[:status] = :failure
       flash[:result_text] = "You must be logged in to do that"
       redirect_to root_path
     end
