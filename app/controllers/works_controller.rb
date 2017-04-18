@@ -2,7 +2,9 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
-  before_action :category_from_work, except: [:root, :index, :new, :create]
+  # before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :category_from_work, only: [:show, :upvote]
+  before_action :require_ownership, only: [:edit, :update, :destroy]
   # before_action :require_login, except: [:root]
 
   def root
@@ -103,5 +105,15 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_ownership
+    require_login
+    category_from_work
+    if @work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You can only change works that you have added"
+      redirect_to work_path(@work)
+    end
   end
 end
