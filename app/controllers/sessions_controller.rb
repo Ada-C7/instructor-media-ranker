@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     auth_hash = request.env['omniauth.auth']
 
     user = User.find_by(oauth_provider: params[:provider], oauth_id: auth_hash["uid"])
-    if user.nil?
+    if user.nil? #If there is no user, create an user with this credentials
       # User doesn't match anything in the DB
       # Attempt to create a new user
       user = User.from_github(auth_hash)
@@ -17,6 +17,7 @@ class SessionsController < ApplicationController
         flash[:message] = "Could not log in"
         user.errors.messages.each do |field, problem|
           flash[:field] = problem.join(', ')
+          #errors.messages =>rails array..
         end
       end
 
@@ -26,6 +27,10 @@ class SessionsController < ApplicationController
       flash[:message] = "Successfully logged in as returning user #{user.username}"
     end
     redirect_to root_path
+  end
+
+  def index
+    @current_user = User.find(session[:user_id])
   end
 
   # def login_form

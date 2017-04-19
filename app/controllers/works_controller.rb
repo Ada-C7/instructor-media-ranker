@@ -41,6 +41,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if session[:user_id] != @work.user_id
+      redirect_to @work
+      flash[:result_text] = "You can't edit this work"
+
+    end
   end
 
   def update
@@ -58,12 +63,16 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if session[:user_id] != @work.user_id
+      redirect_to @work
+      flash[:result_text] = "You can't edit this work"
+    else
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
-
   def upvote
     # Most of these varied paths end in failure
     # Something tragically beautiful about the whole thing
@@ -91,7 +100,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
