@@ -12,6 +12,7 @@ describe User do
 
     it "has a list of ranked works" do
       dan = users(:dan)
+      
       dan.must_respond_to :ranked_works
       dan.ranked_works.each do |work|
         work.must_be_kind_of Work
