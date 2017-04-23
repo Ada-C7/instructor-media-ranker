@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     @user = User.find_by(id: params[:id])
     render_404 unless @user
   end
-  # 
+  #
   # def auth_callback
   #   auth_hash = request.env['omniauth.auth']
   #   user = User.find_by(oauth_provider: params[:provider],
