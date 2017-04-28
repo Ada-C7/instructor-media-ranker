@@ -34,6 +34,10 @@ class Work < ApplicationRecord
     where(category: category).order(vote_count: :desc).limit(10)
   end
 
+  # def self.created_by_current_user?
+  #   self.belongs_to == current_user.id ? true : false
+  # end
+
 private
   def fix_category
     if self.category
