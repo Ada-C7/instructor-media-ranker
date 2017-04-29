@@ -61,6 +61,7 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    must_be_owner
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
