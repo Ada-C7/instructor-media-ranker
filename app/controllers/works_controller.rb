@@ -5,6 +5,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :must_be_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -104,5 +105,16 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def must_be_owner
+    @work = Work.find_by(id: params[:id])
+    # if session user id is the same as the work.user.id
+    if session[:user_id] != @work.user.id
+    # flash must be logged in
+    flash[:status] = :failure
+    flash[:result_text] = "must be logged-in"
+    # edirect_to root_path
+    end
   end
 end
