@@ -42,9 +42,7 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-    must_be_owner
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
@@ -61,7 +59,6 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    must_be_owner
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
