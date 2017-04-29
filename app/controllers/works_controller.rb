@@ -3,6 +3,8 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
+  before_action :work_has_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -22,7 +24,9 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = current_user.id
     if @work.save
+      # raise
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
@@ -38,11 +42,11 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
@@ -90,6 +94,22 @@ class WorksController < ApplicationController
   end
 
 private
+  def work_has_owner
+    @work = Work.find_by(id: params[:id])
+    if @work.user.nil?
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner perform this action."
+      redirect_to work_path(@work.id)
+    else
+      if @work.user.id != session[:user_id]
+        flash[:status] = :failure
+        flash[:result_text] = "You must be the owner perform this action."
+        redirect_to work_path(@work.id)
+      end
+    end
+    # raise
+  end
+
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
