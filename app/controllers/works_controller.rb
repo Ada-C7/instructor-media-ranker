@@ -3,6 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_permission, only: [:edit, :destroy]
   skip_before_action :require_login, only: [:root]
 
   def root
@@ -88,6 +89,14 @@ class WorksController < ApplicationController
     # or the error message
     redirect_back fallback_location: works_path(@media_category), status: status
   end
+
+def require_permission
+  if @login_user != Work.find(params[:id]).user
+    flash[:result_text] = "You must log in to do that"
+    status = :unauthorized
+    redirect_back fallback_location: works_path(@media_category), status: status
+  end
+end
 
 private
   def media_params
