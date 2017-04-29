@@ -19,7 +19,6 @@ class SessionsController < ApplicationController
       session[:user_id] = user.id
       flash[:success] = "Welcome back #{user.username}"
     end
-
     redirect_to root_path
   end
 
