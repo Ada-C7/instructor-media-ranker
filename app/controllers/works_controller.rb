@@ -42,6 +42,7 @@ class WorksController < ApplicationController
   end
 
   def edit
+    must_be_owner
   end
 
   def update
@@ -110,11 +111,17 @@ private
   def must_be_owner
     @work = Work.find_by(id: params[:id])
     # if session user id is the same as the work.user.id
-    if session[:user_id] != @work.user.id
-    # flash must be logged in
-    flash[:status] = :failure
-    flash[:result_text] = "must be logged-in"
-    # edirect_to root_path
+    if @work.user.nil?#== nil
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner"
+      redirect_to work_path(@work.id)
+    else
+      if session[:user_id] != @work.user.id
+        # flash must be logged in
+        flash[:status] = :failure
+        flash[:result_text] = "You must be the owner"
+        redirect_to work_path(@work.id)
+      end
     end
   end
 end
