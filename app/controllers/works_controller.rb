@@ -4,7 +4,6 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root]
-  helper_method :current_user
 
   def root
     @albums = Work.best_albums
@@ -23,7 +22,7 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(user: session[:user_id], media_params)
+    @work = Work.new(media_params)
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -41,6 +40,10 @@ class WorksController < ApplicationController
   end
 
   def edit
+    @work = current_user.works.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+    flash[:error] = "You are not allowed to edit this work."
+    redirect_to work_path(params[:id])
   end
 
   def update
@@ -58,10 +61,13 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    @work = current_user.works.find(params[:id])
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
     redirect_to root_path
+  rescue ActiveRecord::RecordNotFound
+    redirect_to work_path(params[:id]), message: "You are not allowed to delete this."
   end
 
   def upvote
@@ -93,7 +99,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :user_id, :creator, :description, :publication_year)
   end
 
   def category_from_url
