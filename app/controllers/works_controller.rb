@@ -4,7 +4,9 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   before_action :require_login, except: [:root]
-  before_action :can_create_work, only: [:create]
+  before_action :can_create_work, only: [:new]
+  before_action :can_edit_work, only: [:edit]
+  before_action :can_delete_work, only: [:destroy]
 
   def root
     @albums = Work.best_albums
@@ -23,7 +25,8 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(media_params)
+    @work = Work.create!(media_params)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -41,10 +44,12 @@ class WorksController < ApplicationController
   end
 
   def edit
+    @work = Work.find(params[:id])
   end
 
   def update
     @work.update_attributes(media_params)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
@@ -93,7 +98,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_url
