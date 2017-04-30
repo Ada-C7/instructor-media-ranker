@@ -4,8 +4,8 @@ class User < ApplicationRecord
 
   validates :username, uniqueness: true, presence: true
 
-  def self.owns_work(work, user)
-    work.user.id == user.id if work.user_id
+  def owns_work?(work)
+    work.user.id == id if work.user_id
   end
 
   def self.create_from_github(auth_hash)

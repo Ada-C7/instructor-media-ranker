@@ -4,6 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root]
+  before_action :require_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -39,13 +40,7 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-    if !User.owns_work(@work, current_user)
-      flash[:status] = :failure
-      flash[:result_text] = "You cannot edit a work you didn't create."
-      redirect_to work_path
-    end
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
@@ -108,5 +103,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_owner
+    if !current_user.owns_work?(@work)
+      flash[:status] = :failure
+      flash[:result_text] = "You cannot edit or delete a work you didn't create."
+      redirect_to work_path
+    end
   end
 end
