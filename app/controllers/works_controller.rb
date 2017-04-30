@@ -20,7 +20,7 @@ class WorksController < ApplicationController
   end
 
   def new
-    @work = Work.new(category: @media_category)
+    @work = Work.new(user_id: session[:user_id], category: @media_category)
   end
 
   def create
