@@ -1,9 +1,13 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'works#root'
-  get '/login', to: 'sessions#login_form', as: 'login'
-  post '/login', to: 'sessions#login'
+  # get '/login', to: 'sessions#login_form', as: 'login'
+  # post '/login', to: 'sessions#login'
+  # get '/auth/github/callback', to: "sessions#create"
+  
   post '/logout', to: 'sessions#logout', as: 'logout'
+  get "/auth/github/callback", to: "sessions#create"
+
 
   # Build the category routes for albums, books and movies
   category_constraints = { category: /(albums)|(books)|(movies)/}
@@ -16,4 +20,6 @@ Rails.application.routes.draw do
   post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
 
   resources :users, only: [:index, :show]
+
+
 end
