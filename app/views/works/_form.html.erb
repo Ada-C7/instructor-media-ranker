@@ -1,5 +1,6 @@
 <section>
   <%= form_for @work do |f| %>
+    <%= f.hidden_field :user_id, value: @work.user_id %>
     <%= f.hidden_field :category, value: @work.category %>
 
     <%= f.label :title %>
