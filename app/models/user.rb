@@ -5,16 +5,22 @@ class User < ApplicationRecord
 
   validates :name, uniqueness: true, presence: true
 
-  def self.create_from_github(auth_hash)
+  def self.create_from_omniauth(auth_hash)
 
     user = User.new
     user.uid = auth_hash["uid"]
     user.provider = auth_hash["provider"]
-    user.name = auth_hash["info"]["nickname"]
+
+    if auth_hash["info"]["nickname"]
+      user.name = auth_hash["info"]["nickname"]
+    else
+      user.name = auth_hash["info"]["name"]
+    end
+
     user.email = auth_hash["info"]["email"]
     #binding.pry
-
-    user.save ? user : nil
+    user.save
+    return user
 
   end
 

@@ -6,18 +6,17 @@ class ApplicationController < ActionController::Base
   before_action :require_login
 helper_method :current_user
 
-def require_login
-  #See if we have a logged-in user (probably using session)
-  if !session[:user_id]
-    #if not logged-in
-    #Show message about not being logged-in and send to root route
-    flash[:status] = :failure
-    flash[:result_text] = "You must be logged in to view this page"
-    redirect_to root_path
+  def require_login
+    #See if we have a logged-in user (probably using session)
+    if !session[:user_id]
+      #if not logged-in
+      #Show message about not being logged-in and send to root route
+      flash[:status] = :failure
+      flash[:result_text] = "You must be logged in to view this page"
+      redirect_to root_path
+    end
+    #Let it be if there is  someone logged-in
   end
-  #Let it be if there is  someone logged-in
-end
-
 
   def render_404
     # DPR: supposedly this will actually render a 404 page in production
