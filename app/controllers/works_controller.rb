@@ -42,6 +42,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if session[:user_id] != @work.user_id
+      flash[:status] = :failure
+      flash[:result_text] = "This #{@media_category.singularize} can only be updated by its owner."
+      redirect_to works_path(@media_category)
+    end
   end
 
   def update
