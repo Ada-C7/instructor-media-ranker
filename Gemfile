@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem "awesome_print"
 gem "omniauth"
 gem "omniauth-github"
+gem "omniauth-google-oauth2"
 
 ruby '2.4.0'
 
