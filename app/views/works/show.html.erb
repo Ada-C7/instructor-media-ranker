@@ -2,6 +2,7 @@
   <h3><%= @work.title %></h3>
   <p>Created by: <%= @work.creator %></p>
   <p>Published: <%= @work.publication_year %></p>
+  <p>User: <%= @work.user_id %></p>
   <p><%= @work.description %></p>
   <section>
     <%= link_to "Back to #{@media_category.singularize} list", works_path(@media_category), class: "button" %>
