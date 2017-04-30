@@ -3,6 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +23,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    # raise
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -39,9 +41,14 @@ class WorksController < ApplicationController
   end
 
   def edit
+    @work = find_user.works.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to work_path(params[:id]), message: "You cannot edit this event."
   end
 
   def update
+    # @work.update_attributes(media_params) unless @work.user != find_user
+
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
@@ -56,10 +63,21 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    # if @work.user == find_user
+    @work = find_user.works.find(params[:id])
+
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
     redirect_to root_path
+
+  rescue ActiveRecord::RecordNotFound
+    redirect_to work_path(params[:id]), message: "You cannot delete this event."
+    # else
+    #   flash.now[:status] = :error
+    #   flash[:result_text] = "You are not the owner of this work so you cannot change it"
+    #   render 'show'
+    # end
   end
 
   def upvote
@@ -89,9 +107,9 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :user_id, :creator, :description, :publication_year)
   end
 
   def category_from_url
