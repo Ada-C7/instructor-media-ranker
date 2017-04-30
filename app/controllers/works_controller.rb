@@ -1,9 +1,10 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
-  skip_before_action :require_login, only: [:index, :root, :show]
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
+  helper_method :current_user
 
   def root
     @albums = Work.best_albums
@@ -22,7 +23,7 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(media_params)
+    @work = Work.new(user: session[:user_id], media_params)
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
