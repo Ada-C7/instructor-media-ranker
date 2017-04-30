@@ -64,10 +64,16 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if session[:user_id] != @work.user_id
+      flash[:status] = :failure
+      flash[:result_text] = "This #{@media_category.singularize} can only be deleted by its owner."
+      redirect_to works_path(@media_category)
+    else
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
 
   def upvote
