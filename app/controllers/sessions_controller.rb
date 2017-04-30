@@ -9,13 +9,12 @@ class SessionsController < ApplicationController
 
       if user.nil?
         user = User.create_from_github(auth_hash)
-      else
-        flash[:success] =  "Logged in successfully"
-        redirect_to root_path
       end
       session[:user_id] = user.id
+      flash[:success] =  "Logged in successfully"
+      redirect_to root_path
     else
-      flash[:error] = "Could not log on"
+      flash[:error] = "Could not log in"
       redirect_to root_path
     end
 
