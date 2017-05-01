@@ -3,6 +3,8 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_ownership, only: [:edit, :update, :destroy]
+  before_action :require_login, except: [:root]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +24,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = session[:user_id]
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -68,8 +71,8 @@ class WorksController < ApplicationController
     # For status codes, see
     # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if @logged_in_user
+      vote = Vote.new(user: @logged_in_user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
@@ -89,7 +92,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
@@ -102,5 +105,15 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_ownership
+    require_login
+    @work = Work.find_by(id: params[:id])
+    if @work.user_id != @logged_in_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner of this work to make this change"
+      redirect_to :back
+    end
   end
 end
