@@ -1,6 +1,8 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
+  # before_action :require_login, except: :root
+
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
@@ -21,16 +23,27 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(media_params)
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
-      redirect_to works_path(@media_category)
+    if @current_user
+      @work = Work.new(media_params)
+      @work.owner = @current_user.id
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
+        redirect_to works_path(@media_category)
+      else
+        flash[:status] = :failure
+        flash[:result_text] = "Could not create #{@media_category.singularize}"
+        flash[:messages] = @work.errors.messages
+        render :new, status: :bad_request
+      end
     else
+      @work = Work.new(media_params)
+      @work.save
       flash[:status] = :failure
-      flash[:result_text] = "Could not create #{@media_category.singularize}"
+      flash[:result_text] = "You must be logged in to create media"
       flash[:messages] = @work.errors.messages
-      render :new, status: :bad_request
+      render :new, status: :forbidden
+
     end
   end
 
@@ -42,15 +55,30 @@ class WorksController < ApplicationController
   end
 
   def update
-    @work.update_attributes(media_params)
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
-      redirect_to works_path(@media_category)
-    else
+    if @work.owner == @current_user.id
+      @work.update_attributes(media_params)
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+        redirect_to works_path(@media_category)
+      else
+        flash[:message] = "Only logged in users may edit media"
+        flash.now[:status] = :failure
+        flash.now[:result_text] = "Could not update #{@media_category}"
+        flash.now[:messages] = @work.errors.messages
+        render :edit, status: :not_found
+      end
+    elsif @current_user.nil?
+      flash[:message] = "Only logged in users may edit media"
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
+      render :edit, status: :not_found
+    else
+      flash[:message] = "You are not the owner associated with this item"
+      # flash.now[:status] = :failure
+      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+      # flash.now[:messages] = @work.errors.messages
       render :edit, status: :not_found
     end
   end
@@ -68,8 +96,8 @@ class WorksController < ApplicationController
     # For status codes, see
     # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if @current_user
+      vote = Vote.new(user: @current_user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
@@ -91,7 +119,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :owner)
   end
 
   def category_from_url
