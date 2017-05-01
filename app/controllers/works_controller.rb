@@ -3,6 +3,9 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root, :index]
+
+  before_action :original_post, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +25,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = session[:user_id]
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -102,5 +106,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def original_post
+    if @work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "Only the user that uploaded this work can use edit/delete features"
+      redirect_to root_path
+    end
   end
 end
