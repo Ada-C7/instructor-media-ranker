@@ -1,8 +1,11 @@
 class WorksController < ApplicationController
+
+  skip_before_action :require_login, only: [:root]
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :must_be_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +25,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user_id = find_user.id
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -38,8 +42,7 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
@@ -102,5 +105,22 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def must_be_owner
+    @work = Work.find_by(id: params[:id])
+    # if session user id is the same as the work.user.id
+    if @work.user.nil?#== nil
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner"
+      redirect_to work_path(@work.id)
+    else
+      if session[:user_id] != @work.user.id
+        # flash must be logged in
+        flash[:status] = :failure
+        flash[:result_text] = "You must be the owner"
+        redirect_to work_path(@work.id)
+      end
+    end
   end
 end
