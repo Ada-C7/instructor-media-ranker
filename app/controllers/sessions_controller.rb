@@ -1,26 +1,21 @@
 class SessionsController < ApplicationController
-  def login_form
-  end
-
-  def login
-    username = params[:username]
-    if username and user = User.find_by(username: username)
-      session[:user_id] = user.id
-      flash[:status] = :success
-      flash[:result_text] = "Successfully logged in as existing user #{user.username}"
-    else
-      user = User.new(username: username)
-      if user.save
-        session[:user_id] = user.id
-        flash[:status] = :success
-        flash[:result_text] = "Successfully created new user #{user.username} with ID #{user.id}"
+  def create
+  auth_hash = request.env['omniauth.auth']
+  user = User.find_by(oauth_provider: params[:provider], oauth_id: auth_hash["uid"])
+    if user.nil?
+      user = User.from_github(auth_hash)
+        if user.save
+          session[:user_id] = user.id
+          flash[:message] = "Successfully logged in as new user #{user.username}!"
+        else
+          flash.now[:message] = "Could not log in"
+          user.errors.messages.each do |field, problem|
+            flash[:field] = problem.join(', ')
+          end
+        end
       else
-        flash.now[:status] = :failure
-        flash.now[:result_text] = "Could not log in"
-        flash.now[:messages] = user.errors.messages
-        render "login_form", status: :bad_request
-        return
-      end
+        session[:user_id] = user.id
+        flash[:message] = "Successfully logged in as existing user #{user.username}"
     end
     redirect_to root_path
   end
