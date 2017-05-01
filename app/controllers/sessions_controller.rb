@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-
+before_action :require_login, only: [:logout], raise: false
 
   def create
     auth_hash = request.env['omniauth.auth']

@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
   def require_login
     if !session[:user_id]
-      flash[:warning] = "You must be logged in as a user to view this page"
+      flash[:error] = "You must be logged in as a user to view this page"
       redirect_to root_path
     end
   end
