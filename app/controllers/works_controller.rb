@@ -4,6 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root, :index]
+  before_action :check_owner, only: [:edit, :destroy]
 
 
   def root
@@ -114,13 +115,14 @@ private
   def check_owner
     # when user tries to edit or delete a work, check for ownership
     # find_user (returns current user)
-    user = User.find_user
+    user = find_user
     # find_work (returns current work)
     work = find_work
     # compare work.user_id and user.id
     if user.id != work.user_id
         # error message and redirect if they do not match
-      flash[:error] = "You may only edit works that you yourself added."
+      flash[:status] = :failure
+      flash[:result_text] = "You may only edit works that you yourself added."
       redirect_back fallback_location: root_path
     end
   end

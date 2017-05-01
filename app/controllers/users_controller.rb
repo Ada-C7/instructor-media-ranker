@@ -8,7 +8,5 @@ class UsersController < ApplicationController
     render_404 unless @user
   end
 
-  def self.find_user
-    @user = User.find_by(id: session[:user_id])
-  end
+  
 end

@@ -13,14 +13,20 @@ class SessionsController < ApplicationController
       if user.nil?
         flash[:status] = :failure
         flash[:result_text] = "Could not log in"
-        redirect_to root_path
+      else
+        session[:user_id] = user.id
+        flash[:status] = :success
+        flash[:result_text] = "Created new user #{user.username} with ID #{user.id}"
       end
+    else
+      session[:user_id] = user.id
+      flash[:status] = :success
+      flash[:result_text] = "Logged in successfully!"
     end
 
-    session[:user_id] = user.id
-    flash[:status] = :success
-    flash[:result_text] = "Logged in successfully as #{user.username} with ID #{user.id}"
     redirect_to root_path
+
+
   end
 
   def logout
