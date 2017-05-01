@@ -3,8 +3,9 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_login, except: [:root]
   before_action :require_ownership, only: [:edit, :update, :destroy]
-  # before_action :require_login, except: [:root]
+
 
   def root
     @albums = Work.best_albums
@@ -42,11 +43,9 @@ class WorksController < ApplicationController
   end
 
   def edit
-    require_ownership
   end
 
   def update
-    require_ownership
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
@@ -61,23 +60,11 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    require_ownership
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
     redirect_to root_path
   end
-
-  # if @work.user_id = @login_user.id
-  #   @work.destroy
-  #   flash[:status] = :success
-  #   flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-  #   redirect_to root_path
-  # else
-  #   flash.now[:status] = :failure
-  #   flash.now[:result_text] = "You must own #{@media_category.singularize} to be able to destroy it."
-  #   redirect_to work_path
-  # end
 
   def upvote
     # Most of these varied paths end in failure
@@ -119,15 +106,5 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
-  end
-
-  def require_ownership
-    require_login
-    @work = Work.find_by(id: params[:id])
-    if @work.user_id != @login_user.id
-      flash[:status] = :failure
-      flash[:result_text] = "You must be the owner of the work to make that change"
-      redirect_to work_path
-    end
   end
 end
