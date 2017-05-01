@@ -38,6 +38,7 @@ gem 'jbuilder', '~> 2.5'
 
 gem "omniauth"
 gem "omniauth-github"
+gem "omniauth-google-oauth2", "~> 0.2.1"
 
 # Use the Foundation CSS framework
 gem 'foundation-rails'

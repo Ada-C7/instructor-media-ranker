@@ -4,6 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
   before_action :require_login, except: [:root]
+  before_action :auth_user, only:[:edit, :destroy, :update]
 
   def root
     @albums = Work.best_albums
@@ -22,7 +23,16 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(media_params)
+    work_info = {
+      title: media_params[:title],
+      creator: media_params[:creator],
+      description: media_params[:description],
+      category: @media_category,
+      publication_year: media_params[:publication_year],
+      user_id: @current_user.id
+    }
+
+    @work = Work.new(work_info)
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -36,6 +46,7 @@ class WorksController < ApplicationController
   end
 
   def show
+      @votes = @work.votes.order(created_at: :desc)
       flash[:message] = "You need to login to see this"
   end
 
@@ -103,5 +114,14 @@ class WorksController < ApplicationController
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def auth_user
+    lookup_user
+    unless @current_user.id == Work.find_by(id: params[:id]).user_id
+      flash[:result_text] = "You are not authorized for this action!"
+      status = :unauthorized
+      redirect_to root_path
+    end
   end
 end
