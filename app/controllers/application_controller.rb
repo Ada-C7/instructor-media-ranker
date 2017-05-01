@@ -9,15 +9,11 @@ class ApplicationController < ActionController::Base
     if !session[:user_id]
     # if not logged in:
     # show message about not being logged in and to the root route
-      flash[:status] = :failure 
+      flash[:status] = :failure
       flash[:result_text] = "You must be logged in to view this page"
       redirect_to root_path
     end
     # let it be if there's someone logged in
-  end
-
-  def current_user
-    @logged_in_user ||= User.find(session[:user_id]) if session[:user_id]
   end
 
   def render_404
@@ -27,8 +23,6 @@ class ApplicationController < ActionController::Base
 
 private
   def find_user
-    if session[:user_id]
-      @login_user = User.find_by(id: session[:user_id])
-    end
+    @login_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
   end
 end

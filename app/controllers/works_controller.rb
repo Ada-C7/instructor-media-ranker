@@ -43,7 +43,6 @@ class WorksController < ApplicationController
   end
 
   def update
-    if @work.user_id == @logged_in_user.id
       @work.update_attributes(media_params)
       if @work.save
         flash[:status] = :success
@@ -55,24 +54,13 @@ class WorksController < ApplicationController
         flash.now[:messages] = @work.errors.messages
         render :edit, status: :not_found
       end
-    else
-      flash[:status] = :failure
-      flash[:result_text] = "You must be the owner to do this"
-      redirect_to root_path
-    end
   end
 
   def destroy
-    if @work.user_id == @logged_in_user.id
       @work.destroy
       flash[:status] = :success
       flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
       redirect_to root_path
-    else
-      flash[:status] = :failure
-      flash[:result_text] = "You must be the owner to do this"
-      redirect_to root_path
-    end
   end
 
   def upvote
@@ -115,5 +103,14 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def owner
+    work = Work.find_by(id: params[:id])
+    if work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner to do this"
+      redirect_back fallback_location: root_path
+    end
   end
 end
