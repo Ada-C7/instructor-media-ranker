@@ -91,7 +91,7 @@ class WorksController < ApplicationController
   end
 
 def require_permission
-  if @login_user != Work.find(params[:id]).user
+  if @login_user != Work.find(params[:id]).creator
     flash[:result_text] = "You must log in to do that"
     status = :unauthorized
     redirect_back fallback_location: works_path(@media_category), status: status
