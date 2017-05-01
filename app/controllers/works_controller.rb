@@ -5,6 +5,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :auth_user, only:[:edit, :destroy, :update]
 
   def root
     @albums = Work.best_albums
@@ -23,7 +24,16 @@ class WorksController < ApplicationController
   end
 
   def create
-    @work = Work.new(media_params)
+    work_info = {
+      title: media_params[:title],
+      creator: media_params[:creator],
+      description: media_params[:description],
+      category: @media_category,
+      publication_year: media_params[:publication_year],
+      user_id: @current_user.id
+    }
+    @work = Work.new(work_info)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -91,7 +101,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
@@ -104,5 +114,15 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def auth_user
+    unless  @current_user.id == Work.find_by(id: params[:id]).user_id
+      flash[:result_text] = "You are not authorized for this action #{@current_user.username}!"
+      status = :unauthorized
+      # In a before_action filter, this will prevent
+      # the action from running at all
+      redirect_to root_path
+    end
   end
 end
