@@ -90,7 +90,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: works_path(@media_category), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
@@ -103,5 +103,14 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_ownership
+    require_login
+    @work = Work.find_by(id: params[:id])
+    if @work.user_id != @logged_in_user.id
+      flash[:error] = "You must be the owner of this work to make this change"
+      redirect_to :back
+    end
   end
 end
