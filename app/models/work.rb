@@ -12,7 +12,6 @@ class Work < ApplicationRecord
   # We want to fixup the category *before* we validate, because
   # our validations are rather strict about what's OK.
   before_validation :fix_category
-
   def self.by_category(category)
     category = category.singularize.downcase
     self.where(category: category)

@@ -7,4 +7,5 @@ class UsersController < ApplicationController
     @user = User.find_by(id: params[:id])
     render_404 unless @user
   end
+
 end
