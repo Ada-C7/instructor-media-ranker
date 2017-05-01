@@ -111,7 +111,8 @@ class WorksController < ApplicationController
     require_login
     @work = Work.find_by(id: params[:id])
     if @work.user_id != @logged_in_user.id
-      flash[:error] = "You must be the owner of this work to make this change"
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner of this work to make this change"
       redirect_to :back
     end
   end

@@ -11,17 +11,20 @@ before_action :require_login, only: [:logout], raise: false
     end
 
     if user.nil?
-      flash[:error] = "Could not log in."
+      flash[:status] = :failure
+      flash[:result_text] = "Could not log in."
       # redirect_to :back
     else
       session[:user_id] = user.id
-      flash[:success] = "Created new account"
+      flash[:status] = :success
+      flash[:result_text] = "Created new account"
       redirect_to root_path
     end
   else
     session[:user_id] = user.id
-    flash[:success] = "Logged in successfully!"
-    # redirect_to root_path
+    flash[:status] = :success
+    flash[:result_text] = "Logged in successfully!"
+    #  redirect_to root_path
   end
   # def login_form
   # end
