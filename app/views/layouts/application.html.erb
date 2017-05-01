@@ -18,17 +18,25 @@
 
     <!-- TODO DPR: this looks really silly when the screen size is small -->
     <div class="columns large-3 small-12">
-      <% if @login_user %>
-        <p class="text-right">Logged in as <%= link_to @login_user.username, user_path(@login_user) %></p>
-        <%= link_to "Log Out", logout_path, method: :post, class: "button float-right" %>
-      <% else %>
-        <p class="text-right">Not logged in</p>
-        <%= link_to "Log In", login_path, class: "button float-right" %>
-      <% end %>
+      <section class="user-info">
+        <% if @current_user %>
+          <p class="text-right">Logged in as <%= link_to @current_user.username, user_path(@current_user) %></p>
+          <%= link_to "Log Out", logout_path, method: :post, class: "button float-right" %>
+        <% else %>
+          <p class="text-right">Not logged in</p>
+          <%= link_to "Log In", "/auth/github", class: "button float-right" %>
+        <% end %>
+      </section>
     </div>
   </header>
 
-  <% if flash[:result_text] or flash[:messages] %>
+  <section class="flash">
+    <% flash.each do |name, message| %>
+    <div class="<%= name %>"><%= message %></div>
+    <% end %>
+  </section>
+
+  <!-- <% if flash[:result_text] or flash[:messages] %>
     <section class="row status <%= flash[:status] %>">
       <h3><%= flash[:status] == :failure ? "A problem occurred: " : "" %><%= flash[:result_text] %></h3>
       <% if flash[:messages] %>
@@ -41,7 +49,7 @@
         </ul>
       <% end %>
     </section>
-  <% end %>
+  <% end %> -->
 
   <main class="row">
     <%= yield %>

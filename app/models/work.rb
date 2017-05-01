@@ -1,6 +1,7 @@
 class Work < ApplicationRecord
   has_many :votes, dependent: :destroy
   has_many :ranking_users, through: :votes, source: :user
+  belongs_to :user
 
   validates :category,  presence: true,
                         inclusion: { in: %w(album book movie) }
@@ -32,6 +33,14 @@ class Work < ApplicationRecord
 
   def self.top_ten(category)
     where(category: category).order(vote_count: :desc).limit(10)
+  end
+
+  def can_edit?(current_user)
+    if self.user == current_user
+      return true
+    else
+      return false
+    end
   end
 
 private
