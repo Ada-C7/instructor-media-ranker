@@ -28,7 +28,9 @@ class WorksController < ApplicationController
     @work = Work.new(media_params)
 
     @work.user = find_user
+
     # @work.user_id = session[:user_id]
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
