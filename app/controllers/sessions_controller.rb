@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
 
     if user.nil?
       flash[:error] = "Could not log in."
-      redirect_to root_path
+      # redirect_to :back
     else
       session[:user_id] = user.id
       flash[:success] = "Created new account"
@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
   else
     session[:user_id] = user.id
     flash[:success] = "Logged in successfully!"
-    redirect_to root_path
+    # redirect_to root_path
   end
   # def login_form
   # end
