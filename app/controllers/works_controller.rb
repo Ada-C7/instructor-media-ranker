@@ -1,8 +1,11 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
+
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
+
 
   def root
     @albums = Work.best_albums
@@ -17,7 +20,7 @@ class WorksController < ApplicationController
   end
 
   def new
-    @work = Work.new(category: @media_category)
+    @work = Work.new(user_id: session[:user_id], category: @media_category)
   end
 
   def create
@@ -39,6 +42,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if session[:user_id] != @work.user_id
+      flash[:status] = :failure
+      flash[:result_text] = "This #{@media_category.singularize} can only be updated by its owner."
+      redirect_to works_path(@media_category)
+    end
   end
 
   def update
@@ -56,10 +64,16 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if session[:user_id] != @work.user_id
+      flash[:status] = :failure
+      flash[:result_text] = "This #{@media_category.singularize} can only be deleted by its owner."
+      redirect_to works_path(@media_category)
+    else
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
 
   def upvote
@@ -91,7 +105,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:user_id, :title, :category, :creator, :description, :publication_year)
   end
 
   def category_from_url
