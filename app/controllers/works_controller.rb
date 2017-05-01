@@ -1,4 +1,9 @@
 class WorksController < ApplicationController
+  before_action :require_login, except: [:root]
+  before_action :check_owner, only: [:edit, :destroy]
+
+  # before_action :require_login, only: [:new, :show, :index, :create, :update]
+
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
@@ -22,6 +27,8 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user = find_user
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -102,5 +109,19 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def check_owner
+    find_user
+    category_from_work
+    if @work.user != nil
+      if @work.user.username != @login_user.username
+        flash[:message] = "You must be the owner of this book"
+        redirect_to work_path(@work.id)
+      end
+    elsif @work.user == nil
+      flash[:message] = "You must be the owner of this book"
+      redirect_to work_path(@work.id)
+    end
   end
 end
