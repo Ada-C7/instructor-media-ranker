@@ -93,7 +93,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_url
@@ -111,11 +111,17 @@ private
     @work = Work.find_by(id: params[:id])
   end
 
-  # def check_owner
-  #   # when user tries to edit or delete a work, check for ownership
-  #   # find_user (returns current user)
-  #   # find_work (returns current work)
-  #   # compare work.user_id and user.id
-  #   # error message and redirect if they do not match
-  # end
+  def check_owner
+    # when user tries to edit or delete a work, check for ownership
+    # find_user (returns current user)
+    user = User.find_user
+    # find_work (returns current work)
+    work = find_work
+    # compare work.user_id and user.id
+    if user.id != work.user_id
+        # error message and redirect if they do not match
+      flash[:error] = "You may only edit works that you yourself added."
+      redirect_back fallback_location: root_path
+    end
+  end
 end
