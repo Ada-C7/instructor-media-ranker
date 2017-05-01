@@ -3,8 +3,8 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'works#root'
 
-  get '/auth/github/callback', to: 'sessions#create'
-  post '/logout', to: 'sessions#logout', as: 'logout'
+  get "/auth/:provider/callback", to: "sessions#create"
+  delete '/logout', to: 'sessions#logout', as: 'logout'
 
   # Build the category routes for albums, books and movies
   category_constraints = { category: /(albums)|(books)|(movies)/}
