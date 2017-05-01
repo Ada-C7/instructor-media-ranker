@@ -1,5 +1,5 @@
-category,title,creator,publication_year,description
-album,Can't Buy a Thrill,Steely Dan,1972,
+category,title,creator,publication_year,description, user_id
+album,Can't Buy a Thrill,Steely Dan,1972
 album,Countdown to Ecstasy,Steely Dan,1973,
 album,Pretzel Logic,Steely Dan,1974,
 album,Katy Lied,Steely Dan,1975,
