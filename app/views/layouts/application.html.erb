@@ -18,12 +18,12 @@
 
     <!-- TODO DPR: this looks really silly when the screen size is small -->
     <div class="columns large-3 small-12">
-      <% if @login_user %>
-        <p class="text-right">Logged in as <%= link_to @login_user.username, user_path(@login_user) %></p>
-        <%= link_to "Log Out", logout_path, method: :post, class: "button float-right" %>
+      <% if !current_user %>
+      <li><%= link_to "Login using Github", "/auth/github" %></li>
+      <li>You are not logged in</li>
       <% else %>
-        <p class="text-right">Not logged in</p>
-        <%= link_to "Log In", login_path, class: "button float-right" %>
+      <li><%= link_to "Logout", logout_path, method: :delete %></li>
+      <li>You are logged in as  <%= current_user.name %></li>
       <% end %>
     </div>
   </header>
