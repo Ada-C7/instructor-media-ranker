@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,10 +19,12 @@
 
     <!-- TODO DPR: this looks really silly when the screen size is small -->
     <div class="columns large-3 small-12">
-      <% unless session[:user_id] %>
-        <%= link_to "Log in using github", "/auth/github", class: "button float-right" %>
+      <% if @login_user %>
+        <p class="text-right">Logged in as <%= link_to @login_user.username, user_path(@login_user) %></p>
+        <%= link_to "Log Out", logout_path, method: :post, class: "button float-right" %>
       <% else %>
-        <%= link_to "Logout", logout_path, method: :delete, class: "button float-right" %>
+        <p class="text-right">Not logged in</p>
+        <%= link_to "Log In", "/auth/github", class: "button float-right" %>
       <% end %>
     </div>
   </header>
