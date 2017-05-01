@@ -4,6 +4,11 @@ class WorksController < ApplicationController
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
+  before_action :require_login , only: [:show, :index, :new, :create]
+
+  # before_action :check_owner , except: [:upvote]
+  before_action :check_owner , only: [:edit, :destroy]
+
   def root
     @albums = Work.best_albums
     @books = Work.best_books
@@ -13,7 +18,6 @@ class WorksController < ApplicationController
 
   def index
     @media = Work.by_category(@media_category).order(vote_count: :desc)
-    render :index
   end
 
   def new
@@ -22,6 +26,11 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+
+    @work.user = find_user
+
+    # @work.user_id = session[:user_id]
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -63,10 +72,7 @@ class WorksController < ApplicationController
   end
 
   def upvote
-    # Most of these varied paths end in failure
-    # Something tragically beautiful about the whole thing
-    # For status codes, see
-    # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
+
     flash[:status] = :failure
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)
