@@ -1,6 +1,9 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
+  before_action :require_login, except: [:root, :index]
+  before_action :validate_user, only: [:edit, :update, :destroy]
+
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
@@ -22,13 +25,14 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user = @user
     if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
+      # flash[:status] = :success
+      flash[:success] = "Successfully created #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
     else
-      flash[:status] = :failure
-      flash[:result_text] = "Could not create #{@media_category.singularize}"
+      # flash[:status] = :failure
+      flash[:failure] = "Could not create #{@media_category.singularize}"
       flash[:messages] = @work.errors.messages
       render :new, status: :bad_request
     end
@@ -42,14 +46,13 @@ class WorksController < ApplicationController
   end
 
   def update
+
     @work.update_attributes(media_params)
     if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+      flash[:success] = "Successfully updated #{@media_category.singularize} #{@work.id}"
       redirect_to works_path(@media_category)
     else
-      flash.now[:status] = :failure
-      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+      flash.now[:failure] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
       render :edit, status: :not_found
     end
@@ -57,8 +60,7 @@ class WorksController < ApplicationController
 
   def destroy
     @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+    flash[:success] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
     redirect_to root_path
   end
 
@@ -68,19 +70,19 @@ class WorksController < ApplicationController
     # For status codes, see
     # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if @user
+      vote = Vote.new(user: @user, work: @work)
       if vote.save
-        flash[:status] = :success
-        flash[:result_text] = "Successfully upvoted!"
+        # flash[:status] = :success
+        flash[:success] = "Successfully upvoted!"
         status = :found
       else
-        flash[:result_text] = "Could not upvote"
+        flash[:failure] = "Could not upvote"
         flash[:messages] = vote.errors.messages
         status = :conflict
       end
     else
-      flash[:result_text] = "You must log in to do that"
+      flash[:failure] = "You must log in to do that"
       status = :unauthorized
     end
 
