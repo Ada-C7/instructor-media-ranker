@@ -34,10 +34,17 @@
  }
 
  .status.failure {
-   color: #C70039;
+   color: white;
+   background-color: red;
  }
  .status.success {
-   color: #359b18;
+   color: white;
+   background-color: green;
+ }
+
+ .status.warning {
+   color: white;
+   background-color: yellow;
  }
 
  .media-table .upvote.button {

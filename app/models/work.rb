@@ -1,4 +1,5 @@
 class Work < ApplicationRecord
+  belongs_to :user
   has_many :votes, dependent: :destroy
   has_many :ranking_users, through: :votes, source: :user
 
@@ -7,6 +8,8 @@ class Work < ApplicationRecord
 
   validates :title, presence: true,
                     uniqueness: { scope: :category }
+
+  
 
   # This is called a model filter, and is very similar to a controller filter.
   # We want to fixup the category *before* we validate, because
