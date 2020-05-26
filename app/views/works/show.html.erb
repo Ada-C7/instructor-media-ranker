@@ -5,9 +5,9 @@
   <p><%= @work.description %></p>
   <section>
     <%= link_to "Back to #{@media_category.singularize} list", works_path(@media_category), class: "button" %>
-    <%= link_to "Edit", edit_work_path(@work), class: "button" %>
-    <%= link_to "Upvote", upvote_path(@work), class: "button", method: :post %>
-    <%= link_to "Delete", work_path(@work), class: "alert button", method: "delete", data: { confirm: "Are you sure?" } %>
+    <%= link_to "Edit", edit_work_path(@work), class: "button" if current_user.owns_work?(@work)  %>
+    <%= link_to "Upvote", upvote_path(@work), class: "button", method: :post%>
+    <%= link_to "Delete", work_path(@work), class: "alert button", method: "delete", data: { confirm: "Are you sure?" } if current_user.owns_work?(@work) %>
   </section>
 </article>
 

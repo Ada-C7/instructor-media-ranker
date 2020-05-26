@@ -3,6 +3,8 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_url, only: [:index, :new, :create]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root]
+  before_action :require_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -38,8 +40,7 @@ class WorksController < ApplicationController
     @votes = @work.votes.order(created_at: :desc)
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @work.update_attributes(media_params)
@@ -68,8 +69,8 @@ class WorksController < ApplicationController
     # For status codes, see
     # http://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if current_user
+      vote = Vote.new(user: current_user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
@@ -91,7 +92,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_url
@@ -102,5 +103,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_owner
+    if !current_user.owns_work?(@work)
+      flash[:status] = :failure
+      flash[:result_text] = "You cannot edit or delete a work you didn't create."
+      redirect_to work_path
+    end
   end
 end
